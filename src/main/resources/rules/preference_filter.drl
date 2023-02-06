@@ -1,0 +1,66 @@
+package com;
+import com.example.model.Customer;
+import com.example.model.Deal;
+
+global com.example.model.PrefSetting prefSetting;
+
+// dialect "mvel"
+
+
+
+rule 'industry'
+    // salience 1
+    when
+        $passed_customer: Customer( industry.toString == "fs" )
+        $failed_customer: Customer( industry.toString != "fs" )
+    then
+        System.out.println("Printing customers that has passed the industry filter");
+        System.out.println($passed_customer.getId());
+        // System.out.println($failed_customer.getId());
+end
+
+
+rule 'sub industry'
+    // salience 1
+    when
+        $passed_customer: Customer( subIndustry.toString == "fs" )
+        $failed_customer: Customer( subIndustry.toString != "fs" )
+    then
+        System.out.println("Printing customers that has passed the sub_industry filter");
+        System.out.println($passed_customer.getId());
+        // System.out.println($failed_customer.getId());
+end
+
+
+rule 'amount'
+    when
+        $amount: Deal()
+        if ( amount >= prefSetting.getMinAmount() && amount <= prefSetting.getMaxAmount())  break[success]
+    then
+        System.out.println("Amount not Matched successfully"+ $amount.getId());
+        then[success]
+            System.out.println("amount Matched successfully"+ $amount.getId());
+end
+
+
+rule 'roi'
+    when
+        $roi: Deal()
+        if ( roi >= prefSetting.getMinAmount() && roi <= prefSetting.getMaxAmount())  break[success]
+    then
+        System.out.println("Roi not Matched successfully"+ $roi.getId());
+        then[success]
+            System.out.println("Roi Matched successfully"+ $roi.getId());
+end
+
+
+
+rule 'tenor'
+    when
+        $tenor: Deal()
+        if ( tenor >= prefSetting.getMinAmount() && tenor <= prefSetting.getMaxAmount())  break[success]
+    then
+        System.out.println("Roi not Matched successfully"+ $tenor.getId());
+        then[success]
+            System.out.println("Roi Matched successfully"+ $tenor.getId());
+end
