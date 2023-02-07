@@ -1,5 +1,6 @@
 package com.example.service;
  
+import java.util.ArrayList;
 import java.util.List;
 
 import org.kie.api.runtime.KieContainer;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.example.model.Customer;
 import com.example.model.PrefSetting;
 import com.example.model.Deal;
+import com.example.model.FilterResultSet;
 import java.util.List;
  
 @Service
@@ -19,12 +21,14 @@ public class FilterService {
     private KieContainer kieContainer;
     private KieSession kieSession;
 
-    public String runFilter(Customer CustomerRequest) {
-        PrefSetting pref_setting = setPref();
+    public String runFilter() {
+        PrefSetting prefSetting = setPref();
+        FilterResultSet filterResultSet = setFilterResultSet();
         kieSession = kieContainer.newKieSession();
         insertCustomerData(kieSession, false);
         insertDealData(kieSession);
-        kieSession.setGlobal("prefSetting", pref_setting);
+        kieSession.setGlobal("prefSetting", prefSetting);
+        kieSession.setGlobal("filterResultSet", filterResultSet);
         System.out.println("Started to fire the rules");
         kieSession.fireAllRules();
         kieSession.dispose();
@@ -66,14 +70,22 @@ public class FilterService {
     }
 
     PrefSetting setPref(){
+        ArrayList<String> subIndustry = new ArrayList<String>();
+        subIndustry.add("fs");
+        subIndustry.add("ef");
         PrefSetting pref_setting = new PrefSetting();
         pref_setting.setIndustry("fs");
-        pref_setting.setSubIndustry("fs");
+        pref_setting.setSubIndustry(subIndustry);
         pref_setting.setMinAmount(10);
         pref_setting.setMaxAmount(100);
         pref_setting.setMinRoi(10);
         pref_setting.setMaxRoi(100);
         pref_setting.setTenor(100);
         return pref_setting;
+    }
+
+    FilterResultSet setFilterResultSet(){
+        FilterResultSet filterResultSet = new FilterResultSet();
+        return filterResultSet;
     }
 }

@@ -14,9 +14,11 @@ rule 'industry'
         $customer: Customer()
         if ( industry == prefSetting.getIndustry()) break[success]
     then
-        System.out.println("Printing customers that has failed the sub_industry filter" + $customer.getId());
+        System.out.println("Printing customers that has failed the industry filter" + $customer.getId());
         then[success]
-            System.out.println("Printing customers that has passed the sub_industry filter" + $customer.getId());
+            System.out.println("Printing customers that has passed the industry filter" + $customer.getId());
+            filterResultSet.setVariable($customer.getId());
+            // System.out.println("Printing filterResultSet" + filterResultSet.getPassSet());
 end
         
 
@@ -25,7 +27,9 @@ rule 'sub industry'
     // salience 1
     when
         $customer: Customer()
-        if (prefSetting.getSubIndustry().contains(subIndustry) ) break[success]
+        // if (prefSetting.getSubIndustry().contains(subIndustry) ) break[success]
+        if (filterResultSet.getPassSet().contains(id) && 
+            prefSetting.getSubIndustry().contains(subIndustry) ) break[success]
     then
         System.out.println("Printing customers that has failed the sub_industry filter" + $customer.getId());
         then[success]

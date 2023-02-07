@@ -1,6 +1,8 @@
 package com.example.model;
 
  
+import java.util.ArrayList;
+
 import lombok.Getter;
 import lombok.Setter;
  
@@ -9,7 +11,7 @@ import lombok.Setter;
 public class PrefSetting {
  
     public String industry;
-    public String subIndustry;
+    public ArrayList<String> subIndustry;
     public Integer minAmount;
     public Integer maxAmount;
     public Integer minRoi;

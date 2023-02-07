@@ -21,8 +21,8 @@ public class PreferenceFilterController {
     private FilterService filterService;
  
     @PostMapping("/filter")
-    public String runFilter(@RequestBody Customer customerRequest) {
-        String res = filterService.runFilter(customerRequest);
+    public String runFilter() {
+        String res = filterService.runFilter();
         // return new ResponseEntity<>("discount", HttpStatus.OK);
         return res;
     }

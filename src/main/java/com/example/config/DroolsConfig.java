@@ -13,7 +13,8 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class DroolsConfig {
-    private static final String RULES_CUSTOMER_RULES_DRL = "rules/preference_filter.drl";
+    // private static final String RULES_CUSTOMER_RULES_DRL = "rules/preference_filter.drl";
+    private static final String RULES_CUSTOMER_RULES_DRL = "rules/preference_filter_pipeline.drl";
     private static final KieServices kieServices = KieServices.Factory.get();
  
     @Bean
