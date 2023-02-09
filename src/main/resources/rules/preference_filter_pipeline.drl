@@ -5,67 +5,82 @@ import com.example.model.Deal;
 global com.example.model.PrefSetting prefSetting;
 global com.example.model.FilterResultSet filterResultSet;
 
-// dialect "mvel"
+dialect "mvel"
 
 
-rule 'industry'
-    // salience 1
+// rule 'industry'
+//     // salience 2
+//     when
+//         $customer: Customer()
+//         if ($customer.industry == prefSetting.getIndustry()) break[success]
+//     then
+//         System.out.println("Printing customers that has failed the industry filter" + $customer.getId());
+//         then[success]
+//             System.out.println("Printing customers that has passed the industry filter" + $customer.getId());
+//             filterResultSet.setVariable($customer.getId());
+//             // System.out.println("Printing filterResultSet" + filterResultSet.getPassSet());
+// end
+
+
+// rule 'sub industry'
+//     // salience 1
+//     when
+//         $customer: Customer()
+//         // if (prefSetting.getSubIndustry().contains(subIndustry) ) break[success]
+//         if (filterResultSet.getPassSet().contains($customer.id) && 
+//             prefSetting.getSubIndustry().contains($customer.subIndustry) ) break[success]
+//     then
+//         System.out.println("Printing customers that has failed the sub_industry filter" + $customer.getId());
+//         then[success]
+//             System.out.println("Printing customers that has passed the sub_industry filter" + $customer.getId());
+// end
+
+
+// rule 'amount'
+//     when
+//         $deal: Deal()
+//         if ($deal.amount >= prefSetting.getMinAmount() && $deal.amount <= prefSetting.getMaxAmount())  break[success]
+//     then
+//         System.out.println("Amount not Matched successfully"+ $deal.getId());
+//         then[success]
+//             System.out.println("amount Matched successfully"+ $deal.getId());
+// end
+
+
+// rule 'roi'
+//     when
+//         $deal: Deal()
+//         if ($deal.roi >= prefSetting.getMinAmount() && $deal.roi <= prefSetting.getMaxAmount())  break[success]
+//     then
+//         System.out.println("Roi not Matched successfully"+ $deal.getId());
+//         then[success]
+//             System.out.println("Roi Matched successfully"+ $deal.getId());
+// end
+
+
+
+// rule 'tenor'
+//     when
+//         $deal: Deal()
+//         if ( $deal.tenor >= prefSetting.getMinAmount() && $deal.tenor <= prefSetting.getMaxAmount())  break[success]
+//     then
+//         System.out.println("Roi not Matched successfully"+ $deal.getId());
+//         then[success]
+//             System.out.println("Roi Matched successfully"+ $deal.getId());
+// end
+
+
+// Customized filtering testing
+rule 'industry with customized filtering'
+    // salience 2
     when
-        $customer: Customer()
-        if ( industry == prefSetting.getIndustry()) break[success]
+        $categories: Object() from accumulate(ip: Customer(industry == prefSetting.getIndustry());
+                                          collectSet(ip.getId()))
+        $customers: Integer() from $categories
+        $deal: Deal()
+        if($deal.id == $customers) break[success]
     then
-        System.out.println("Printing customers that has failed the industry filter" + $customer.getId());
+        System.out.println("Customized filtering failed" + $deal.getId());
         then[success]
-            System.out.println("Printing customers that has passed the industry filter" + $customer.getId());
-            filterResultSet.setVariable($customer.getId());
-            // System.out.println("Printing filterResultSet" + filterResultSet.getPassSet());
-end
-        
-
-
-rule 'sub industry'
-    // salience 1
-    when
-        $customer: Customer()
-        // if (prefSetting.getSubIndustry().contains(subIndustry) ) break[success]
-        if (filterResultSet.getPassSet().contains(id) && 
-            prefSetting.getSubIndustry().contains(subIndustry) ) break[success]
-    then
-        System.out.println("Printing customers that has failed the sub_industry filter" + $customer.getId());
-        then[success]
-            System.out.println("Printing customers that has passed the sub_industry filter" + $customer.getId());
-end
-
-
-rule 'amount'
-    when
-        $amount: Deal()
-        if ( amount >= prefSetting.getMinAmount() && amount <= prefSetting.getMaxAmount())  break[success]
-    then
-        System.out.println("Amount not Matched successfully"+ $amount.getId());
-        then[success]
-            System.out.println("amount Matched successfully"+ $amount.getId());
-end
-
-
-rule 'roi'
-    when
-        $roi: Deal()
-        if ( roi >= prefSetting.getMinAmount() && roi <= prefSetting.getMaxAmount())  break[success]
-    then
-        System.out.println("Roi not Matched successfully"+ $roi.getId());
-        then[success]
-            System.out.println("Roi Matched successfully"+ $roi.getId());
-end
-
-
-
-rule 'tenor'
-    when
-        $tenor: Deal()
-        if ( tenor >= prefSetting.getMinAmount() && tenor <= prefSetting.getMaxAmount())  break[success]
-    then
-        System.out.println("Roi not Matched successfully"+ $tenor.getId());
-        then[success]
-            System.out.println("Roi Matched successfully"+ $tenor.getId());
+            System.out.println("Customized filtering executed successfully" + $deal.getId());
 end

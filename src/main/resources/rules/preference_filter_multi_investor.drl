@@ -1,0 +1,38 @@
+package com;
+import com.example.model.Customer;
+import com.example.model.Deal;
+import com.example.model.InvestorPref;
+
+global com.example.model.PrefSetting prefSetting;
+global com.example.model.FilterResultSet filterResultSet;
+
+dialect "mvel"
+
+
+rule 'industry'
+    // salience 2
+    when
+        $customer: Customer()
+        $investorPref: InvestorPref()
+        if ($customer.industry == $investorPref.getIndustry()) break[success]
+    then
+        System.out.println("Investor --- " + $investorPref.getEntityId() + " --- failed for the customer in filter industry---" + $customer.getId());
+        then[success]
+            System.out.println("Investor --- " + $investorPref.getEntityId() + " --- passed for the customer in filter industry---" + $customer.getId());
+            filterResultSet.setMap($investorPref.getEntityId(), $customer.getId());
+end
+
+rule 'sub industry'
+    // salience 2
+    when
+        $customer: Customer()
+        $investorPref: InvestorPref()
+        $prevResult: Object() from filterResultSet.getMapValue($investorPref.getEntityId());
+        $newPrevResult: Integer() from $prevResult
+        if ($customer.getId() == $newPrevResult && $customer.getSubIndustry() == $investorPref.getSubIndustry()) break[success]
+    then
+        System.out.println("Investor --- " + $investorPref.getEntityId() + " --- failed for the customer in filter sub industry---" + $customer.getId());
+        then[success]
+            System.out.println("Investor --- " + $investorPref.getEntityId() + " --- passed for the customer in filter sub industry---" + $customer.getId());
+            filterResultSet.setMap($investorPref.getEntityId(), $customer.getId());
+end

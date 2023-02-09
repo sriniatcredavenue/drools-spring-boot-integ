@@ -12,6 +12,7 @@ import com.example.model.Customer;
 import com.example.model.PrefSetting;
 import com.example.model.Deal;
 import com.example.model.FilterResultSet;
+import com.example.model.InvestorPref;
 import java.util.List;
  
 @Service
@@ -27,14 +28,20 @@ public class FilterService {
         kieSession = kieContainer.newKieSession();
         insertCustomerData(kieSession, false);
         insertDealData(kieSession);
+        insertPrefData(kieSession);
         kieSession.setGlobal("prefSetting", prefSetting);
         kieSession.setGlobal("filterResultSet", filterResultSet);
         System.out.println("Started to fire the rules");
         kieSession.fireAllRules();
+        filterResultSet.viewMap();
+        // System.out.println(kieSession.getIdentifier());
+        // System.out.println(kieSession.getProcessInstance(0));
+        // System.out.println(kieSession.getSessionConfiguration());
         kieSession.dispose();
         return "Success";
     }
 
+    // Take data from Mongo/elastic search and insert into kieserssion
     void insertCustomerData(KieSession kieSession, Boolean flag){
         for(int i=0;i<2;i++){
             Customer newCustomer = new Customer();
@@ -69,6 +76,24 @@ public class FilterService {
         }
     }
 
+    // Load all the investor preference setting and insert into the kie session
+    void insertPrefData(KieSession kieSession){
+        
+        for(int i=0;i<3;i++){
+            InvestorPref pref_setting = new InvestorPref();
+            pref_setting.setIndustry("fs");
+            pref_setting.setEntityId(i + 100);
+            pref_setting.setSubIndustry("fs");
+            pref_setting.setMinAmount(10);
+            pref_setting.setMaxAmount(100);
+            pref_setting.setMinRoi(10);
+            pref_setting.setMaxRoi(100);
+            pref_setting.setTenor(100);
+            kieSession.insert(pref_setting);
+        }
+    }
+
+    // Mongod and load the investor preference into drools session
     PrefSetting setPref(){
         ArrayList<String> subIndustry = new ArrayList<String>();
         subIndustry.add("fs");
