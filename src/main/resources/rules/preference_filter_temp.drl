@@ -1,0 +1,60 @@
+package com;
+import com.example.model.Customer;
+import com.example.model.Deal;
+import com.example.model.InvestorPref;
+
+// global com.example.model.PrefSetting prefSetting;
+global com.example.model.FilterResultSet filterResultSet;
+import java.util.ArrayList;
+
+dialect "mvel"
+
+
+rule 'industry'
+    // salience 2
+    when
+        $customer: Customer() 
+        $investorPref: InvestorPref()
+        if($investorPref.subIndustry != null) then
+            if ($customer.industry == $investorPref.getIndustry() && ($investorPref.subIndustry != null && $investorPref.subIndustry == "fs")) break[success]
+    then
+        System.out.println("Investor --- " + $investorPref.getSubIndustry() + " --- failed1 for the customer in filter industry---" + $customer.getId());
+        then[success]
+            System.out.println("Investor --- " + $investorPref.getSubIndustry() + " --- passed1 for the customer in filter industry---" + $customer.getId());
+            filterResultSet.setMap($investorPref.getEntityId(), $customer.getId());
+end
+
+
+// function void hello(Customer customer, InvestorPref investor) {
+//     for(int i=0;i<3;i++){   
+//         System.out.println("Inside function for the customer -----" + customer.getId());
+//         System.out.println("Inside function for the investor -----" + investor.getEntityId());
+//     }
+// }
+
+// rule 'sub industry'
+//     when
+//         // $customer: Customer()
+//         // $investorPref: InvestorPref()
+//         $events : ArrayList( size >= 0 ) from collect (Customer(id == 1)) 
+
+
+//     then
+//         System.out.println("The event is" + $events);
+//         // hello($customer, $investorPref);
+// end
+
+// rule 'sub industry'
+//     // salience 2
+//     when
+//         $customer: Customer()
+//         $investorPref: InvestorPref()
+//         $prevResult: Object() from filterResultSet.getMapValue($investorPref.getEntityId());
+//         $newPrevResult: Integer() from $prevResult
+//         if ($customer.getId() == $newPrevResult && $customer.getSubIndustry() == $investorPref.getSubIndustry()) break[success]
+//     then
+//         System.out.println("Investor --- " + $investorPref.getEntityId() + " --- failed for the customer in filter sub industry---" + $customer.getId());
+//         then[success]
+//             System.out.println("Investor --- " + $investorPref.getEntityId() + " --- passed for the customer in filter sub industry---" + $customer.getId());
+//             filterResultSet.setMap($investorPref.getEntityId(), $customer.getId());
+// end
