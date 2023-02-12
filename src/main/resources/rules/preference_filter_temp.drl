@@ -3,20 +3,24 @@ import com.example.model.Customer;
 import com.example.model.Deal;
 import com.example.model.InvestorPref;
 
-// global com.example.model.PrefSetting prefSetting;
+global com.example.model.PrefSetting prefSetting;
 global com.example.model.FilterResultSet filterResultSet;
 import java.util.ArrayList;
 
 dialect "mvel"
 
+function Boolean evaluate(Customer customer, InvestorPref investorPref){
+    return(customer.getIndustry() == investorPref.getIndustry());
+}
 
 rule 'industry'
     // salience 2
     when
         $customer: Customer() 
         $investorPref: InvestorPref()
-        if($investorPref.subIndustry != null) then
-            if ($customer.industry == $investorPref.getIndustry() && ($investorPref.subIndustry != null && $investorPref.subIndustry == "fs")) break[success]
+        $res: Object() from evaluate($customer, $investorPref)
+        $final_res: Boolean() from $res
+        if($final_res) break[success]
     then
         System.out.println("Investor --- " + $investorPref.getSubIndustry() + " --- failed1 for the customer in filter industry---" + $customer.getId());
         then[success]
