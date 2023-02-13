@@ -10,6 +10,8 @@ import java.util.ArrayList;
 dialect "mvel"
 
 function Boolean evaluate(Customer customer, InvestorPref investorPref){
+    // if InvestorPref.operator == 'equality'
+    // elsif InvestorPref.operator == 'range' >= && <=
     return(customer.getIndustry() == investorPref.getIndustry());
 }
 
