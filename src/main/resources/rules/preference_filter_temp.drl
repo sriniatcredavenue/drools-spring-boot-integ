@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 dialect "mvel"
 
-function Boolean evaluate(Customer customer, InvestorPref investorPref){
+function Boolean evaluate(Customer customer, InvestorPref investorPref, String rule_name){
     // if InvestorPref.operator == 'equality'
     // elsif InvestorPref.operator == 'range' >= && <=
     return(customer.getIndustry() == investorPref.getIndustry());
@@ -20,7 +20,7 @@ rule 'industry'
     when
         $customer: Customer() 
         $investorPref: InvestorPref()
-        $res: Object() from evaluate($customer, $investorPref)
+        $res: Object() from evaluate($customer, $investorPref, "industry")
         $final_res: Boolean() from $res
         if($final_res) break[success]
     then
