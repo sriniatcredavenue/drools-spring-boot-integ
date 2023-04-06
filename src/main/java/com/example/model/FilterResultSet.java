@@ -30,25 +30,36 @@ public class FilterResultSet {
         // return passSet;
     }
 
+    public void addToMap(Integer investor_id, Integer passedCustomers){
+        if(!this.map.containsKey(investor_id)){
+            this.map.put(investor_id, new ArrayList<Integer>());
+        }
+        this.map.get(investor_id).add(passedCustomers);
+    }
+
     public void setMap(Integer investor_id, Integer passedCustomers){
-        ArrayList<Integer> newPassedCustomers = new ArrayList<Integer>();
-        newPassedCustomers.add(0, passedCustomers);
-        if(this.map.containsKey(investor_id)){
-            Set<Integer> old_result = new HashSet<Integer>(this.map.get(investor_id));
-            Set<Integer> new_result = new HashSet<Integer>(newPassedCustomers);
-            old_result.retainAll(new_result);
-            // Integer[] result = old_result.toArray(new Integer[old_result.size()]);
-            ArrayList<Integer> result = new ArrayList<Integer>();
-            result.addAll(old_result);
-            this.map.replace(investor_id, result);
+        ArrayList<Integer> old_result = this.map.get(investor_id);
+        if(!old_result.contains(passedCustomers)){
+            old_result.remove(passedCustomers);
         }
-        else{
-            this.map.put(investor_id, newPassedCustomers);
-        }
+        // System.out.println("-------hello " + old_result + "------");
+        // ArrayList<Integer> newPassedCustomers = new ArrayList<Integer>();
+        // newPassedCustomers.add(0, passedCustomers);
+        // if(this.map.containsKey(investor_id)){
+        //     ArrayList<Integer> old_result = this.map.get(investor_id);
+        //     ArrayList<Integer> new_result = newPassedCustomers;
+        //     new_result.retainAll(old_result);
+        //     old_result.addAll(new_result);
+        //     System.out.println("-------hello " + old_result + "------");
+        //     this.map.replace(investor_id, old_result);
+        // }
+        // else{
+        //     this.map.put(investor_id, newPassedCustomers);
+        // }
     }
 
     public void viewMap(){
-        for(Map.Entry<Integer, ArrayList<Integer> > entry:map.entrySet()){    
+        for(Map.Entry<Integer, ArrayList<Integer> > entry:this.map.entrySet()){    
             int key=entry.getKey();  
             ArrayList<Integer> value=entry.getValue();  
             System.out.println("Filtered output of" + key + "is" + value);

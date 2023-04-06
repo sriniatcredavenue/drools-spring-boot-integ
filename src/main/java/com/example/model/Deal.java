@@ -7,7 +7,7 @@ import lombok.Setter;
 public class Deal {
     private Integer id;
     private Integer customerId;
-    private Integer amount;
-    private Integer tenor;
-    private Integer roi;
+    private Double amount;
+    private Double tenor;
+    private Double roi;
 }

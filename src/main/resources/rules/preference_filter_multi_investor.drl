@@ -1,6 +1,8 @@
 package com;
 import com.example.model.Customer;
 import com.example.model.Deal;
+import com.example.model.Rating;
+import com.example.model.FinancialRatio;
 import com.example.model.InvestorPref;
 
 global com.example.model.PrefSetting prefSetting;
@@ -19,20 +21,368 @@ rule 'industry'
         System.out.println("Investor --- " + $investorPref.getEntityId() + " --- failed for the customer in filter industry---" + $customer.getId());
         then[success]
             System.out.println("Investor --- " + $investorPref.getEntityId() + " --- passed for the customer in filter industry---" + $customer.getId());
-            filterResultSet.setMap($investorPref.getEntityId(), $customer.getId());
+            filterResultSet.addToMap($investorPref.getEntityId(), $customer.getId());
 end
 
 rule 'sub industry'
     // salience 2
     when
-        $customer: Customer()
         $investorPref: InvestorPref()
         $prevResult: Object() from filterResultSet.getMapValue($investorPref.getEntityId());
         $newPrevResult: Integer() from $prevResult
-        if ($customer.getId() == $newPrevResult && $customer.getSubIndustry() == $investorPref.getSubIndustry()) break[success]
+        $customer: Customer(id == $newPrevResult)
+        if ($customer.getSubIndustry() == $investorPref.getSubIndustry()) break[success]
     then
         System.out.println("Investor --- " + $investorPref.getEntityId() + " --- failed for the customer in filter sub industry---" + $customer.getId());
         then[success]
             System.out.println("Investor --- " + $investorPref.getEntityId() + " --- passed for the customer in filter sub industry---" + $customer.getId());
             filterResultSet.setMap($investorPref.getEntityId(), $customer.getId());
 end
+
+// rule 'negative industry'
+//     // salience 2
+//     when
+//         $investorPref: InvestorPref()
+//         $prevResult: Object() from filterResultSet.getMapValue($investorPref.getEntityId());
+//         $newPrevResult: Integer() from $prevResult
+//         $customer: Customer(id == $newPrevResult)
+//         if ($customer.getIndustry() != $investorPref.getIndustry()) break[success]
+//     then
+//         System.out.println("Investor --- " + $investorPref.getEntityId() + " --- failed for the customer in filter negative industry---" + $customer.getId());
+//         then[success]
+//             System.out.println("Investor --- " + $investorPref.getEntityId() + " --- passed for the customer in filter negative industry---" + $customer.getId());
+//             filterResultSet.setMap($investorPref.getEntityId(), $customer.getId());
+// end
+
+// rule 'negative sub industry'
+//     // salience 2
+//     when
+//         $investorPref: InvestorPref()
+//         $prevResult: Object() from filterResultSet.getMapValue($investorPref.getEntityId());
+//         $newPrevResult: Integer() from $prevResult
+//         $customer: Customer(id == $newPrevResult)
+//         if ($customer.getSubIndustry() != $investorPref.getSubIndustry()) break[success]
+//     then
+//         System.out.println("Investor --- " + $investorPref.getEntityId() + " --- failed for the customer in filter negative sub industry---" + $customer.getId());
+//         then[success]
+//             System.out.println("Investor --- " + $investorPref.getEntityId() + " --- passed for the customer in filter negative sub industry---" + $customer.getId());
+//             filterResultSet.setMap($investorPref.getEntityId(), $customer.getId());
+// end
+
+rule 'Rating'
+    // salience 2
+    when
+        $investorPref: InvestorPref()
+        $prevResult: Object() from filterResultSet.getMapValue($investorPref.getEntityId());
+        $newPrevResult: Integer() from $prevResult
+        $rating: Rating(customerId == $newPrevResult)
+        if ($rating.getRating() == $investorPref.getRating()) break[success]
+    then
+        System.out.println("Investor --- " + $investorPref.getEntityId() + " --- failed for the customer in filter rating---" + $rating.getCustomerId());
+        then[success]
+            System.out.println("Investor --- " + $investorPref.getEntityId() + " --- passed for the customer in filter rating---" + $rating.getCustomerId());
+            filterResultSet.setMap($investorPref.getEntityId(), $rating.getCustomerId());
+end
+
+
+rule 'Rating Agency'
+    // salience 2
+    when
+        $investorPref: InvestorPref()
+        $prevResult: Object() from filterResultSet.getMapValue($investorPref.getEntityId());
+        $newPrevResult: Integer() from $prevResult
+        $rating: Rating(customerId == $newPrevResult)
+        if ($rating.getRatingAgency() == $investorPref.getRatingAgency()) break[success]
+    then
+        System.out.println("Investor --- " + $investorPref.getEntityId() + " --- failed for the customer in filter rating agency---" + $rating.getCustomerId());
+        then[success]
+            System.out.println("Investor --- " + $investorPref.getEntityId() + " --- passed for the customer in filter rating agency---" + $rating.getCustomerId());
+            filterResultSet.setMap($investorPref.getEntityId(), $rating.getCustomerId());
+end
+
+
+rule 'Net Revenue'
+    // salience 2
+    when
+        $investorPref: InvestorPref()
+        $prevResult: Object() from filterResultSet.getMapValue($investorPref.getEntityId());
+        $newPrevResult: Integer() from $prevResult
+        $finRatio: FinancialRatio(customerId == $newPrevResult)
+        if ($finRatio.getNetRevenue() >= $investorPref.getMinNetRevenue() && $finRatio.getNetRevenue() <= $investorPref.getMaxNetRevenue()) break[success]
+    then
+        System.out.println("Investor --- " + $investorPref.getEntityId() + " --- failed for the customer in filter net revenue---" + $finRatio.getCustomerId());
+        then[success]
+            System.out.println("Investor --- " + $investorPref.getEntityId() + " --- passed for the customer in filter net revenue---" + $finRatio.getCustomerId());
+            filterResultSet.setMap($investorPref.getEntityId(), $finRatio.getCustomerId());
+end
+
+
+rule 'Ebitda'
+    // salience 2
+    when
+        $investorPref: InvestorPref()
+        $prevResult: Object() from filterResultSet.getMapValue($investorPref.getEntityId());
+        $newPrevResult: Integer() from $prevResult
+        $finRatio: FinancialRatio(customerId == $newPrevResult)
+        if ($finRatio.getEbitda() >= $investorPref.getMinEbitda() && $finRatio.getEbitda() <= $investorPref.getMaxEbitda()) break[success]
+    then
+        System.out.println("Investor --- " + $investorPref.getEntityId() + " --- failed for the customer in filter ebitda---" + $finRatio.getCustomerId());
+        then[success]
+            System.out.println("Investor --- " + $investorPref.getEntityId() + " --- passed for the customer in filter ebitda---" + $finRatio.getCustomerId());
+            filterResultSet.setMap($investorPref.getEntityId(), $finRatio.getCustomerId());
+end
+
+rule 'EbitdaCsf'
+    // salience 2
+    when
+        $investorPref: InvestorPref()
+        $prevResult: Object() from filterResultSet.getMapValue($investorPref.getEntityId());
+        $newPrevResult: Integer() from $prevResult
+        $finRatio: FinancialRatio(customerId == $newPrevResult)
+        if ($finRatio.getEbitdaCsf() >= $investorPref.getMinEbitdaCsf() && $finRatio.getEbitdaCsf() <= $investorPref.getMaxEbitdaCsf()) break[success]
+    then
+        System.out.println("Investor --- " + $investorPref.getEntityId() + " --- failed for the customer in filter ebitda csf---" + $finRatio.getCustomerId());
+        then[success]
+            System.out.println("Investor --- " + $investorPref.getEntityId() + " --- passed for the customer in filter ebitda csf---" + $finRatio.getCustomerId());
+            filterResultSet.setMap($investorPref.getEntityId(), $finRatio.getCustomerId());
+end
+
+rule 'ProfitAfterTax'
+    // salience 2
+    when
+        $investorPref: InvestorPref()
+        $prevResult: Object() from filterResultSet.getMapValue($investorPref.getEntityId());
+        $newPrevResult: Integer() from $prevResult
+        $finRatio: FinancialRatio(customerId == $newPrevResult)
+        if ($finRatio.getProfitAfterTax() >= $investorPref.getMinProfitAfterTax() && $finRatio.getProfitAfterTax() <= $investorPref.getMaxProfitAfterTax()) break[success]
+    then
+        System.out.println("Investor --- " + $investorPref.getEntityId() + " --- failed for the customer in filter profit after tax---" + $finRatio.getCustomerId());
+        then[success]
+            System.out.println("Investor --- " + $investorPref.getEntityId() + " --- passed for the customer in filter profit after tax---" + $finRatio.getCustomerId());
+            filterResultSet.setMap($investorPref.getEntityId(), $finRatio.getCustomerId());
+end
+
+rule 'ProfitAfterTaxCsf'
+    // salience 2
+    when
+        $investorPref: InvestorPref()
+        $prevResult: Object() from filterResultSet.getMapValue($investorPref.getEntityId());
+        $newPrevResult: Integer() from $prevResult
+        $finRatio: FinancialRatio(customerId == $newPrevResult)
+        if ($finRatio.getProfitAfterTaxCsf() >= $investorPref.getMinProfitAfterTaxCsf() && $finRatio.getProfitAfterTaxCsf() <= $investorPref.getMaxProfitAfterTaxCsf()) break[success]
+    then
+        System.out.println("Investor --- " + $investorPref.getEntityId() + " --- failed for the customer in filter profit after tax csf---" + $finRatio.getCustomerId());
+        then[success]
+            System.out.println("Investor --- " + $investorPref.getEntityId() + " --- passed for the customer in filter profit after tax csf---" + $finRatio.getCustomerId());
+            filterResultSet.setMap($investorPref.getEntityId(), $finRatio.getCustomerId());
+end
+
+rule 'TotalDebtEbitda'
+    // salience 2
+    when
+        $investorPref: InvestorPref()
+        $prevResult: Object() from filterResultSet.getMapValue($investorPref.getEntityId());
+        $newPrevResult: Integer() from $prevResult
+        $finRatio: FinancialRatio(customerId == $newPrevResult)
+        if ($finRatio.getTotalDebtEbitda() >= $investorPref.getMinTotalDebtEbitda() && $finRatio.getTotalDebtEbitda() <= $investorPref.getMaxTotalDebtEbitda()) break[success]
+    then
+        System.out.println("Investor --- " + $investorPref.getEntityId() + " --- failed for the customer in filter TotalDebtEbitda---" + $finRatio.getCustomerId());
+        then[success]
+            System.out.println("Investor --- " + $investorPref.getEntityId() + " --- passed for the customer in filter TotalDebtEbitda---" + $finRatio.getCustomerId());
+            filterResultSet.setMap($investorPref.getEntityId(), $finRatio.getCustomerId());
+end
+
+
+rule 'DebtEquityRatio'
+    // salience 2
+    when
+        $investorPref: InvestorPref()
+        $prevResult: Object() from filterResultSet.getMapValue($investorPref.getEntityId());
+        $newPrevResult: Integer() from $prevResult
+        $finRatio: FinancialRatio(customerId == $newPrevResult)
+        if ($finRatio.getDebtEquityRatio() >= $investorPref.getMinDebtEquityRatio() && $finRatio.getDebtEquityRatio() <= $investorPref.getMaxDebtEquityRatio()) break[success]
+    then
+        System.out.println("Investor --- " + $investorPref.getEntityId() + " --- failed for the customer in filter DebtEquityRatio---" + $finRatio.getCustomerId());
+        then[success]
+            System.out.println("Investor --- " + $investorPref.getEntityId() + " --- passed for the customer in filter DebtEquityRatio---" + $finRatio.getCustomerId());
+            filterResultSet.setMap($investorPref.getEntityId(), $finRatio.getCustomerId());
+end
+
+
+rule 'Current Ratio'
+    // salience 2
+    when
+        $investorPref: InvestorPref()
+        $prevResult: Object() from filterResultSet.getMapValue($investorPref.getEntityId());
+        $newPrevResult: Integer() from $prevResult
+        $finRatio: FinancialRatio(customerId == $newPrevResult)
+        if ($finRatio.getCurrentRatio() >= $investorPref.getMinCurrentRatio() && $finRatio.getCurrentRatio() <= $investorPref.getMaxCurrentRatio()) break[success]
+    then
+        System.out.println("Investor --- " + $investorPref.getEntityId() + " --- failed for the customer in filter Current Ratio---" + $finRatio.getCustomerId());
+        then[success]
+            System.out.println("Investor --- " + $investorPref.getEntityId() + " --- passed for the customer in filter Current Ratio---" + $finRatio.getCustomerId());
+            filterResultSet.setMap($investorPref.getEntityId(), $finRatio.getCustomerId());
+end
+
+
+rule 'Dscr'
+    // salience 2
+    when
+        $investorPref: InvestorPref()
+        $prevResult: Object() from filterResultSet.getMapValue($investorPref.getEntityId());
+        $newPrevResult: Integer() from $prevResult
+        $finRatio: FinancialRatio(customerId == $newPrevResult)
+        if ($finRatio.getDscr() >= $investorPref.getMinDscr() && $finRatio.getDscr() <= $investorPref.getMaxDscr()) break[success]
+    then
+        System.out.println("Investor --- " + $investorPref.getEntityId() + " --- failed for the customer in filter Dscr---" + $finRatio.getCustomerId());
+        then[success]
+            System.out.println("Investor --- " + $investorPref.getEntityId() + " --- passed for the customer in filter Dscr---" + $finRatio.getCustomerId());
+            filterResultSet.setMap($investorPref.getEntityId(), $finRatio.getCustomerId());
+end
+
+
+rule 'totAtnw'
+    // salience 2
+    when
+        $investorPref: InvestorPref()
+        $prevResult: Object() from filterResultSet.getMapValue($investorPref.getEntityId());
+        $newPrevResult: Integer() from $prevResult
+        $finRatio: FinancialRatio(customerId == $newPrevResult)
+        if ($finRatio.getTotAtnw() >= $investorPref.getMinTotAtnw() && $finRatio.getTotAtnw() <= $investorPref.getMaxTotAtnw()) break[success]
+    then
+        System.out.println("Investor --- " + $investorPref.getEntityId() + " --- failed for the customer in filter totAtnw---" + $finRatio.getCustomerId());
+        then[success]
+            System.out.println("Investor --- " + $investorPref.getEntityId() + " --- passed for the customer in filter totAtnw---" + $finRatio.getCustomerId());
+            filterResultSet.setMap($investorPref.getEntityId(), $finRatio.getCustomerId());
+end
+
+
+rule 'LppAnnualRevenue'
+    // salience 2
+    when
+        $investorPref: InvestorPref()
+        $prevResult: Object() from filterResultSet.getMapValue($investorPref.getEntityId());
+        $newPrevResult: Integer() from $prevResult
+        $finRatio: FinancialRatio(customerId == $newPrevResult)
+        if ($finRatio.getLppAnnualRevenue() >= $investorPref.getMinLppAnnualRevenue() && $finRatio.getLppAnnualRevenue() <= $investorPref.getMaxLppAnnualRevenue()) break[success]
+    then
+        System.out.println("Investor --- " + $investorPref.getEntityId() + " --- failed for the customer in filter LppAnnualRevenue---" + $finRatio.getCustomerId());
+        then[success]
+            System.out.println("Investor --- " + $investorPref.getEntityId() + " --- passed for the customer in filter LppAnnualRevenue---" + $finRatio.getCustomerId());
+            filterResultSet.setMap($investorPref.getEntityId(), $finRatio.getCustomerId());
+end
+
+
+rule 'lppAnnualEbitda'
+    // salience 2
+    when
+        $investorPref: InvestorPref()
+        $prevResult: Object() from filterResultSet.getMapValue($investorPref.getEntityId());
+        $newPrevResult: Integer() from $prevResult
+        $finRatio: FinancialRatio(customerId == $newPrevResult)
+        if ($finRatio.getLppAnnualEbitda() >= $investorPref.getMinLppAnnualEbitda() && $finRatio.getLppAnnualEbitda() <= $investorPref.getMaxLppAnnualEbitda()) break[success]
+    then
+        System.out.println("Investor --- " + $investorPref.getEntityId() + " --- failed for the customer in filter lppAnnualEbitda---" + $finRatio.getCustomerId());
+        then[success]
+            System.out.println("Investor --- " + $investorPref.getEntityId() + " --- passed for the customer in filter lppAnnualEbitda---" + $finRatio.getCustomerId());
+            filterResultSet.setMap($investorPref.getEntityId(), $finRatio.getCustomerId());
+end
+
+
+rule 'LppNetProfit'
+    // salience 2
+    when
+        $investorPref: InvestorPref()
+        $prevResult: Object() from filterResultSet.getMapValue($investorPref.getEntityId());
+        $newPrevResult: Integer() from $prevResult
+        $finRatio: FinancialRatio(customerId == $newPrevResult)
+        if ($finRatio.getLppNetProfit() >= $investorPref.getMinLppNetProfit() && $finRatio.getLppNetProfit() <= $investorPref.getMaxLppNetProfit()) break[success]
+    then
+        System.out.println("Investor --- " + $investorPref.getEntityId() + " --- failed for the customer in filter LppNetProfit---" + $finRatio.getCustomerId());
+        then[success]
+            System.out.println("Investor --- " + $investorPref.getEntityId() + " --- passed for the customer in filter LppNetProfit---" + $finRatio.getCustomerId());
+            filterResultSet.setMap($investorPref.getEntityId(), $finRatio.getCustomerId());
+end
+
+
+rule 'LppNetWorth'
+    // salience 2
+    when
+        $investorPref: InvestorPref()
+        $prevResult: Object() from filterResultSet.getMapValue($investorPref.getEntityId());
+        $newPrevResult: Integer() from $prevResult
+        $finRatio: FinancialRatio(customerId == $newPrevResult)
+        if ($finRatio.getLppNetWorth() >= $investorPref.getMinLppNetWorth() && $finRatio.getLppNetWorth() <= $investorPref.getMaxLppNetWorth()) break[success]
+    then
+        System.out.println("Investor --- " + $investorPref.getEntityId() + " --- failed for the customer in filter LppNetWorth---" + $finRatio.getCustomerId());
+        then[success]
+            System.out.println("Investor --- " + $investorPref.getEntityId() + " --- passed for the customer in filter LppNetWorth---" + $finRatio.getCustomerId());
+            filterResultSet.setMap($investorPref.getEntityId(), $finRatio.getCustomerId());
+end
+
+rule 'LppAbbEmi'
+    // salience 2
+    when
+        $investorPref: InvestorPref()
+        $prevResult: Object() from filterResultSet.getMapValue($investorPref.getEntityId());
+        $newPrevResult: Integer() from $prevResult
+        $finRatio: FinancialRatio(customerId == $newPrevResult)
+        if ($finRatio.getLppAbbEmi() >= $investorPref.getMinLppAbbEmi() && $finRatio.getLppAbbEmi() <= $investorPref.getMaxLppAbbEmi()) break[success]
+    then
+        System.out.println("Investor --- " + $investorPref.getEntityId() + " --- failed for the customer in filter LppAbbEmi---" + $finRatio.getCustomerId());
+        then[success]
+            System.out.println("Investor --- " + $investorPref.getEntityId() + " --- passed for the customer in filter LppAbbEmi---" + $finRatio.getCustomerId());
+            filterResultSet.setMap($investorPref.getEntityId(), $finRatio.getCustomerId());
+end
+
+rule 'LppDscr'
+    // salience 2
+    when
+        $investorPref: InvestorPref()
+        $prevResult: Object() from filterResultSet.getMapValue($investorPref.getEntityId());
+        $newPrevResult: Integer() from $prevResult
+        $finRatio: FinancialRatio(customerId == $newPrevResult)
+        if ($finRatio.getLppDscr() >= $investorPref.getMinLppDscr() && $finRatio.getLppDscr() <= $investorPref.getMaxLppDscr()) break[success]
+    then
+        System.out.println("Investor --- " + $investorPref.getEntityId() + " --- failed for the customer in filter LppDscr---" + $finRatio.getCustomerId());
+        then[success]
+            System.out.println("Investor --- " + $investorPref.getEntityId() + " --- passed for the customer in filter LppDscr---" + $finRatio.getCustomerId());
+            filterResultSet.setMap($investorPref.getEntityId(), $finRatio.getCustomerId());
+end
+
+
+// rule 'Net Revenue'
+//     // salience 2
+//     when
+//         $investorPref: InvestorPref()
+//         $prevResult: Object() from filterResultSet.getMapValue($investorPref.getEntityId());
+//         $newPrevResult: Integer() from $prevResult
+//         $finRatio: FinancialRatio(customerId == $newPrevResult)
+//         if ($finRatio.getNetRevenue() >= $investorPref.getMinNetRevenue() && $finRatio.getNetRevenue() <= $investorPref.getMaxNetRevenue()) break[success]
+//     then
+//         System.out.println("Investor --- " + $investorPref.getEntityId() + " --- failed for the customer in filter net revenue---" + $finRatio.getCustomerId());
+//         then[success]
+//             System.out.println("Investor --- " + $investorPref.getEntityId() + " --- passed for the customer in filter net revenue---" + $finRatio.getCustomerId());
+//             filterResultSet.setMap($investorPref.getEntityId(), $finRatio.getCustomerId());
+// end
+
+
+// rule 'Net Revenue'
+//     // salience 2
+//     when
+//         $investorPref: InvestorPref()
+//         $prevResult: Object() from filterResultSet.getMapValue($investorPref.getEntityId());
+//         $newPrevResult: Integer() from $prevResult
+//         $finRatio: FinancialRatio(customerId == $newPrevResult)
+//         if ($finRatio.getNetRevenue() >= $investorPref.getMinNetRevenue() && $finRatio.getNetRevenue() <= $investorPref.getMaxNetRevenue()) break[success]
+//     then
+//         System.out.println("Investor --- " + $investorPref.getEntityId() + " --- failed for the customer in filter net revenue---" + $finRatio.getCustomerId());
+//         then[success]
+//             System.out.println("Investor --- " + $investorPref.getEntityId() + " --- passed for the customer in filter net revenue---" + $finRatio.getCustomerId());
+//             filterResultSet.setMap($investorPref.getEntityId(), $finRatio.getCustomerId());
+// end
+
+
+
+
+
